@@ -2,7 +2,7 @@
 # at which to sample grasp candidates.
 
 # The point cloud.
-gpd_ros/CloudSources cloud_sources
+gpd_ros2/CloudSources cloud_sources
 
 # The indices into the point cloud at which to sample grasp candidates.
 std_msgs/Int64[] indices

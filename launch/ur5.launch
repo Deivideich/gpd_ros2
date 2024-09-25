@@ -1,5 +1,5 @@
 <launch>
-  <node name="detect_grasps" pkg="gpd_ros" type="detect_grasps" output="screen">
+  <node name="DetectGrasps" pkg="gpd_ros2" type="DetectGrasps" output="screen">
 
     <!-- If sequential importance sampling is used (default: false) -->
 <!--

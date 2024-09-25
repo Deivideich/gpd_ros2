@@ -1,8 +1,8 @@
-#include <gpd_ros/grasp_messages.h>
+#include <gpd_ros2/grasp_messages.h>
 
-gpd_ros::GraspConfigList GraspMessages::createGraspListMsg(const std::vector<std::unique_ptr<gpd::candidate::Hand>>& hands, const std_msgs::Header& header)
+gpd_ros2::GraspConfigList GraspMessages::createGraspListMsg(const std::vector<std::unique_ptr<gpd::candidate::Hand>>& hands, const std_msgs::Header& header)
 {
-  gpd_ros::GraspConfigList msg;
+  gpd_ros2::GraspConfigList msg;
 
   for (int i = 0; i < hands.size(); i++) {
     msg.grasps.push_back(convertToGraspMsg(*hands[i]));
@@ -13,9 +13,9 @@ gpd_ros::GraspConfigList GraspMessages::createGraspListMsg(const std::vector<std
   return msg;
 }
 
-gpd_ros::GraspConfig GraspMessages::convertToGraspMsg(const gpd::candidate::Hand& hand)
+gpd_ros2::GraspConfig GraspMessages::convertToGraspMsg(const gpd::candidate::Hand& hand)
 {
-  gpd_ros::GraspConfig msg;
+  gpd_ros2::GraspConfig msg;
   tf::pointEigenToMsg(hand.getPosition(), msg.position);
   tf::vectorEigenToMsg(hand.getApproach(), msg.approach);
   tf::vectorEigenToMsg(hand.getBinormal(), msg.binormal);

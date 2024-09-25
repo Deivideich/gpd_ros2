@@ -1,7 +1,7 @@
 # ROS Wrapper for GPD
 
 * [Author's website](http://www.ccs.neu.edu/home/atp/)
-* [License](https://github.com/atenpas/gpd_ros/blob/master/LICENSE.md)
+* [License](https://github.com/atenpas/gpd_ros2/blob/master/LICENSE.md)
 * [GPD library](https://github.com/atenpas/gpd)
 
 ## Overview
@@ -20,7 +20,7 @@ instructions should work for other Linux distributions.
 
    ```
    cd <location_of_your_workspace>/src
-   git clone https://github.com/atenpas/gpd_ros
+   git clone https://github.com/atenpas/gpd_ros2
    ```
 
 3. Build your catkin workspace:
@@ -38,20 +38,20 @@ absolute file paths and change them to actual paths on your system.
 
 Next, you need to modify the path in the ROS launch file that points to the 
 config file that you changed in the previous step, e.g., 
-[this line](https://github.com/atenpas/gpd_ros/blob/master/launch/ur5.launch#L18).
+[this line](https://github.com/atenpas/gpd_ros2/blob/master/launch/ur5.launch#L18).
 
 Now, you can run GPD as a ROS node. The following command will launch a ROS node
 that waits for point clouds on the ROS topic `/cloud_stitched`. Once a point
 cloud is received, the node will search the cloud for grasps.
 
 ```
-roslaunch gpd_ros ur5.launch
+roslaunch gpd_ros2 ur5.launch
 ```
 
 ## 3) Using Advanced Messages
 
 If you want to speed up GPD or look for grasps on a specific object, you should 
-use one of these messages: [CloudSamples](https://github.com/atenpas/gpd_ros/blob/master/msg/CloudSamples.msg), [CloudIndexed](https://github.com/atenpas/gpd_ros/blob/master/msg/CloudIndexed.msg). Both of these messages build up on the [CloudSources](https://github.com/atenpas/gpd_ros/blob/master/msg/CloudSources.msg) message that can be used to represent a point cloud whose points were seen by multiple cameras or from multiple viewpoints.
+use one of these messages: [CloudSamples](https://github.com/atenpas/gpd_ros2/blob/master/msg/CloudSamples.msg), [CloudIndexed](https://github.com/atenpas/gpd_ros2/blob/master/msg/CloudIndexed.msg). Both of these messages build up on the [CloudSources](https://github.com/atenpas/gpd_ros2/blob/master/msg/CloudSources.msg) message that can be used to represent a point cloud whose points were seen by multiple cameras or from multiple viewpoints.
 
 As a typical use case for the `CloudSamples` message, consider a table with a single object on top of it, observed by one camera. The complete point cloud should be put in the message so that GPD can check grasp poses against collisions with the table. Samples in the message should correspond to points on the object so that GPD can search for grasps on the object (and avoids searching for grasps on the table).
 

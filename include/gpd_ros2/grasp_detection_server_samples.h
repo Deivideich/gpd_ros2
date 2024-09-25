@@ -30,12 +30,12 @@
  */
 
 
-#ifndef GRASP_DETECTION_SERVER_H_
-#define GRASP_DETECTION_SERVER_H_
+#ifndef GRASP_DETECTION_SERVER_SAMPLES_H_
+#define GRASP_DETECTION_SERVER_SAMPLES_H_
 
 
 // ROS
-#include <eigen_conversions/eigen_msg.h>
+#include <tf2_eigen/tf2_eigen.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
@@ -43,19 +43,19 @@
 
 // GPD
 #include <gpd/util/cloud.h>
-#include <gpd_ros/CloudSamples.h>
+#include <gpd_ros2/CloudSamples.h>
 #include <gpd/grasp_detector.h>
 
 // this project (services)
-#include <gpd_ros/detect_grasps.h>
+#include <gpd_ros2/DetectGraspsSamples.h>
 
 // this project (messages)
-#include <gpd_ros/GraspConfig.h>
-#include <gpd_ros/GraspConfigList.h>
+#include <gpd_ros2/GraspConfig.h>
+#include <gpd_ros2/GraspConfigList.h>
 
 // this project (headers)
-#include <gpd_ros/grasp_messages.h>
-#include <gpd_ros/grasp_plotter.h>
+#include <gpd_ros2/grasp_messages.h>
+#include <gpd_ros2/grasp_plotter.h>
 
 typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloudRGBA;
 typedef pcl::PointCloud<pcl::PointNormal> PointCloudPointNormal;
@@ -85,13 +85,12 @@ public:
    * \param req the service request
    * \param res the service response
    */
-  bool detectGrasps(gpd_ros::detect_grasps::Request& req, gpd_ros::detect_grasps::Response& res);
+  bool DetectGrasps(gpd_ros2::DetectGraspsSamples::Request& req, gpd_ros2::DetectGraspsSamples::Response& res);
 
 
 private:
 
   ros::Publisher grasps_pub_; ///< ROS publisher for grasp list messages
-  ros::Publisher pc_pub_1_;
 
   std_msgs::Header cloud_camera_header_; ///< stores header of the point cloud
   std::string frame_; ///< point cloud frame
@@ -105,4 +104,4 @@ private:
   Eigen::Vector3d view_point_; ///< (input) view point of the camera onto the point cloud
 };
 
-#endif /* GRASP_DETECTION_SERVER_H_ */
+#endif /* GRASP_DETECTION_SERVER_SAMPLES_H_ */
