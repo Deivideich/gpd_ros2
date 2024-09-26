@@ -5,7 +5,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
+# Find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
@@ -14,15 +14,25 @@ find_package(rclpy REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(tf2_eigen REQUIRED)
-find_package(gpd_ros2_msg REQURED)
+find_package(gpd_ros2_msgs REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
+find_package(Eigen3 REQUIRED)
 
-add_executable(example_node src/example_node.cpp)
-target_include_directories(example_node PUBLIC
+# Instead of add_executable, use add_library
+add_library(grasp_messages src/grasp_messages.cpp)
+
+# Include directories for the library
+target_include_directories(
+  grasp_messages
+  PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_compile_features(example_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+  $<INSTALL_INTERFACE:include>
+)
+
+target_compile_features(grasp_messages PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+
 ament_target_dependencies(
-  example_node
+  grasp_messages
   "std_msgs"
   "visualization_msgs"
   "rclcpp"
@@ -30,19 +40,16 @@ ament_target_dependencies(
   "sensor_msgs"
   "geometry_msgs"
   "tf2_eigen"
+  "gpd_ros2_msgs"
+  "tf2_geometry_msgs"
 )
 
-install(TARGETS example_node
+install(TARGETS grasp_messages
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # comment the line when a copyright and license is added to all source files
   set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # comment the line when this package is in a git repo and when
-  # a copyright and license is added to all source files
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()

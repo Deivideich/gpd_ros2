@@ -27,8 +27,6 @@ endif()
 # Include directories
 include_directories(${tf2_eigen_INCLUDE_DIRS} include ${PCL_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
 
-# Set C++ flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native -mtune=intel -msse4.2 -mavx2 -mfma -flto -fopenmp -fPIC -Wno-deprecated -Wenum-compare -Wno-ignored-attributes -std=c++17")
 
 # Generate messages and services
 rosidl_generate_interfaces(${PROJECT_NAME}
