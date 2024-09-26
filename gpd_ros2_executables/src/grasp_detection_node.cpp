@@ -111,7 +111,7 @@ std::vector<std::unique_ptr<gpd::candidate::Hand>> GraspDetectionNode::detectGra
 //    cloud_camera_->filterWorkspace(workspace_);
 //    cloud_camera_->voxelizeCloud(0.003);
 //    cloud_camera_->calculateNormals(4);
-//    grasps = importance_sampling_->DetectGrasps(*cloud_camera_);
+//    grasps = importance_sampling_->detectGrasps(*cloud_camera_);
 	  printf("Error: importance sampling is not supported yet\n");
   }
   else
@@ -120,7 +120,7 @@ std::vector<std::unique_ptr<gpd::candidate::Hand>> GraspDetectionNode::detectGra
     grasp_detector_->preprocessPointCloud(*cloud_camera_);
 
     // detect grasps in the point cloud
-    grasps = grasp_detector_->DetectGrasps(*cloud_camera_);
+    grasps = grasp_detector_->detectGrasps(*cloud_camera_);
   }
 
   // Publish the selected grasps.
@@ -296,7 +296,7 @@ int main(int argc, char** argv)
   std::srand(std::time(0));
 
   // initialize ROS
-  ros::init(argc, argv, "DetectGrasps");
+  ros::init(argc, argv, "detect_grasps");
   ros::NodeHandle node("~");
 
   GraspDetectionNode grasp_detection(node);

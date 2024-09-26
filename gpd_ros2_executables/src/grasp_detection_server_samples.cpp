@@ -1,4 +1,4 @@
-#include <gpd_ros2/grasp_detection_server.h>
+#include <gpd_ros2/grasp_detection_server_samples.h>
 
 
 GraspDetectionServer::GraspDetectionServer(ros::NodeHandle& node)
@@ -30,19 +30,19 @@ GraspDetectionServer::GraspDetectionServer(ros::NodeHandle& node)
 
   // Advertise ROS topic for detected grasps.
   grasps_pub_ = node.advertise<gpd_ros2::GraspConfigList>("clustered_grasps", 10);
-  pc_pub_1_ = node.advertise<sensor_msgs::PointCloud2>("/test_pc_Server", 10);
 
   node.getParam("workspace", workspace_);
 }
 
 
-bool GraspDetectionServer::DetectGrasps(gpd_ros2::DetectGrasps::Request& req, gpd_ros2::DetectGrasps::Response& res)
+bool GraspDetectionServer::detectGrasps(gpd_ros2::detect_grasps_samples::Request& req, gpd_ros2::detect_grasps_samples::Response& res)
 {
   ROS_INFO("Received service request ...");
 
+  const gpd_ros2::CloudSamples& msg = req.cloud_samples;
   // 1. Initialize cloud camera.
   cloud_camera_ = NULL;
-  const gpd_ros2::CloudSources& cloud_sources = req.cloud_indexed.cloud_sources;
+  const gpd_ros2::CloudSources& cloud_sources = msg.cloud_sources;
 
   // Set view points.
   Eigen::Matrix3Xd view_points(3, cloud_sources.view_points.size());
@@ -53,7 +53,6 @@ bool GraspDetectionServer::DetectGrasps(gpd_ros2::DetectGrasps::Request& req, gp
   }
 
   // Set point cloud.
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_xyz(new pcl::PointCloud<pcl::PointXYZ>);
   if (cloud_sources.cloud.fields.size() == 6 && cloud_sources.cloud.fields[3].name == "normal_x"
     && cloud_sources.cloud.fields[4].name == "normal_y" && cloud_sources.cloud.fields[5].name == "normal_z")
   {
@@ -71,9 +70,8 @@ bool GraspDetectionServer::DetectGrasps(gpd_ros2::DetectGrasps::Request& req, gp
   }
   else
   {
-    pcl::fromROSMsg(cloud_sources.cloud, *cloud_xyz);
     PointCloudRGBA::Ptr cloud(new PointCloudRGBA);
-    pcl::copyPointCloud(*cloud_xyz, *cloud);
+    pcl::fromROSMsg(cloud_sources.cloud, *cloud);
 
     // TODO: multiple cameras can see the same point
     Eigen::MatrixXi camera_source = Eigen::MatrixXi::Zero(view_points.cols(), cloud->size());
@@ -86,47 +84,46 @@ bool GraspDetectionServer::DetectGrasps(gpd_ros2::DetectGrasps::Request& req, gp
     std::cout << "view_points:\n" << view_points << "\n";
   }
 
-  // Set the indices at which to sample grasp candidates.
-  std::vector<int> indices(req.cloud_indexed.indices.size());
-  for (int i=0; i < indices.size(); i++)
+  ROS_INFO_STREAM("test 0");
+  // Set the samples at which to sample grasp candidates.
+  Eigen::Matrix3Xd samples(3, msg.samples.size());
+  for (int i=0; i < msg.samples.size(); i++)
   {
-    indices[i] = req.cloud_indexed.indices[i].data;
+    samples.col(i) << msg.samples[i].x, msg.samples[i].y, msg.samples[i].z;
   }
-  cloud_camera_->setSampleIndices(indices);
-  
-  // TEST
-  
-  pcl::PointCloud<pcl::PointXYZ>::Ptr tmpPC(new pcl::PointCloud<pcl::PointXYZ>);
-  sensor_msgs::PointCloud2 tmp;
-  ROS_INFO_STREAM("Points in old: " <<cloud_xyz->points.size());
-  ROS_INFO_STREAM("Inliers: " <<indices.size());
 
-  pcl::copyPointCloud(*cloud_xyz, indices, *tmpPC);
-  pcl::toROSMsg(*tmpPC, tmp);
-  tmp.header.frame_id = cloud_sources.cloud.header.frame_id;
-  tmp.header.stamp = cloud_sources.cloud.header.stamp;
-  pc_pub_1_.publish(tmp);
+  ROS_INFO_STREAM("test 1: " << msg.samples.size());
+  ROS_INFO_STREAM("IN: rows " << samples.rows() << " cols " << samples.cols());
   
-  // END
-  frame_ = cloud_sources.cloud.header.frame_id;
+  if (cloud_camera_ == NULL) {
+    ROS_INFO_STREAM("cloud_camera_ NULL");  
+  }
+  cloud_camera_->setSamples(samples);
+  ROS_INFO_STREAM("test 2");
+  frame_ = msg.cloud_sources.cloud.header.frame_id;
 
   ROS_INFO_STREAM("Received cloud with " << cloud_camera_->getCloudProcessed()->size() << " points, and "
-    << req.cloud_indexed.indices.size() << " samples");
+    << cloud_camera_->getSamples().cols() << " samples");
 
   // 2. Preprocess the point cloud.
   grasp_detector_->preprocessPointCloud(*cloud_camera_);
 
+  ROS_INFO_STREAM("test 3");
   // 3. Detect grasps in the point cloud.
-  std::vector<std::unique_ptr<gpd::candidate::Hand>> grasps = grasp_detector_->DetectGrasps(*cloud_camera_);
+  std::vector<std::unique_ptr<gpd::candidate::Hand>> grasps = grasp_detector_->detectGrasps(*cloud_camera_);
 
+  ROS_INFO_STREAM("test 4" << grasps.size());
   if (grasps.size() > 0)
   {
+
     // Visualize the detected grasps in rviz.
     if (use_rviz_)
     {
       rviz_plotter_->drawGrasps(grasps, frame_);
     }
 
+
+    ROS_INFO_STREAM("test 5");
     // Publish the detected grasps.
     gpd_ros2::GraspConfigList selected_grasps_msg = GraspMessages::createGraspListMsg(grasps, cloud_camera_header_);
     res.grasp_configs = selected_grasps_msg;
@@ -144,14 +141,15 @@ int main(int argc, char** argv)
   std::srand(std::time(0));
 
   // initialize ROS
-  ros::init(argc, argv, "DetectGrasps_server");
+  ros::init(argc, argv, "detect_grasps_server");
   ros::NodeHandle node("~");
+
 
   GraspDetectionServer grasp_detection_server(node);
 
-  ros::ServiceServer service = node.advertiseService("DetectGrasps", &GraspDetectionServer::DetectGrasps,
+  ros::ServiceServer service = node.advertiseService("detect_grasps_samples", &GraspDetectionServer::detectGrasps,
                                                      &grasp_detection_server);
-  ROS_INFO("Grasp detection service is waiting for a point cloud ...");
+  ROS_INFO("Grasp detection service ready!");
 
   ros::spin();
 
