@@ -50,7 +50,7 @@
 #include <gpd_ros2/DetectGrasps.h>
 
 // this project (messages)
-#include <gpd_ros2/GraspConfig.h>
+#include <gpd_ros2/msg/GraspConfig.h>
 #include <gpd_ros2/GraspConfigList.h>
 
 // this project (headers)

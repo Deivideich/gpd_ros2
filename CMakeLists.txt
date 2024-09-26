@@ -43,11 +43,11 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   DEPENDENCIES geometry_msgs sensor_msgs std_msgs visualization_msgs
 )
 
+ament_export_dependencies(geometry_msgs rclcpp rclpy sensor_msgs std_msgs PCL Eigen3 rosidl_default_runtime)
+
 # Package configuration
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME}_grasp_messages ${PROJECT_NAME}_grasp_plotter)
-ament_export_dependencies(geometry_msgs rclcpp rclpy sensor_msgs std_msgs PCL Eigen3 rosidl_default_runtime)
-ament_package()
 
 ###########
 ## Build ##
@@ -112,3 +112,4 @@ target_link_libraries(${PROJECT_NAME}_grasp_plotter
 target_link_libraries(${PROJECT_NAME}_grasp_messages
                       ${GPD_LIB}
                       rclcpp::rclcpp)
+ament_package()

@@ -59,7 +59,7 @@
 #include <gpd_ros2/CloudIndexed.h>
 #include <gpd_ros2/CloudSamples.h>
 #include <gpd_ros2/CloudSources.h>
-#include <gpd_ros2/GraspConfig.h>
+#include <gpd_ros2/msg/GraspConfig.h>
 #include <gpd_ros2/GraspConfigList.h>
 #include <gpd_ros2/SamplesMsg.h>
 

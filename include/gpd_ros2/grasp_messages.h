@@ -35,8 +35,8 @@
 #include <tf2_eigen/tf2_eigen.h>
 
 #include <gpd/candidate/hand.h>
+#include "gpd_ros2/msg/grasp_config.hpp"
 
-#include <gpd_ros2/GraspConfig.h>
 #include <gpd_ros2/GraspConfigList.h>
 
 namespace GraspMessages
