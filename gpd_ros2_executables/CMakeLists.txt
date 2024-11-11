@@ -18,6 +18,8 @@ find_package(tf2_eigen REQUIRED)
 find_package(gpd_ros2_msgs REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(pcl_conversions REQUIRED)
+find_package(pcl_msgs REQUIRED)
 
 # Instead of add_executable, use add_library
 add_library(grasp_messages src/grasp_messages.cpp)
@@ -64,6 +66,8 @@ ament_target_dependencies(
 #   "tf2_eigen"
 #   "gpd_ros2_msgs"
 #   "tf2_geometry_msgs"
+#   "pcl_conversions"
+#   "pcl_msgs"
 # )
 
 install(TARGETS grasp_messages 
