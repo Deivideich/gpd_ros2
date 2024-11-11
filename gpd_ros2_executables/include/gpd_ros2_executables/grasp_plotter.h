@@ -29,20 +29,18 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #ifndef GRASP_PLOTTER_H_
 #define GRASP_PLOTTER_H_
 
-// ROS
-#include <ros/ros.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <visualization_msgs/Marker.h>
-#include <visualization_msgs/MarkerArray.h>
+// ROS2
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <visualization_msgs/msg/marker.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 // GPG
 #include <gpd/candidate/hand.h>
 #include <gpd/candidate/hand_geometry.h>
-
 
 /** GraspPlotter class
  *
@@ -51,15 +49,15 @@
  * This class provides functions to draw grasps in rviz.
  *
  */
-class GraspPlotter
+class GraspPlotter : public rclcpp::Node
 {
 public:
 
   /**
    * \brief Constructor.
-   * \param node the ROS node
+   * \param params the hand geometry parameters
   */
-  GraspPlotter(ros::NodeHandle& node, const gpd::candidate::HandGeometry& params);
+  GraspPlotter(const gpd::candidate::HandGeometry& params);
 
   /**
    * \brief Visualize grasps in rviz.
@@ -73,35 +71,36 @@ public:
    * \param hands list of grasps
    * \param frame_id the name of the frame that the grasp is in
    */
-  visualization_msgs::MarkerArray convertToVisualGraspMsg(const std::vector<std::unique_ptr<gpd::candidate::Hand>>& hands,
+  visualization_msgs::msg::MarkerArray convertToVisualGraspMsg(const std::vector<std::unique_ptr<gpd::candidate::Hand>>& hands,
     const std::string& frame_id);
 
   /**
    * \brief Convert a list of grasps to a ROS message that can be published to rviz.
-   * \param hands list of grasps
    * \param center the center of the finger
    * \param rot the orientation of the hand
-   * \param length the length of the finger
-   * \param width the width of the finger
-   * \param height the height of the finger
+   * \param lwh the length, width, and height of the finger
+   * \param id unique ID for the marker
    * \param frame_id the name of the frame that the grasp is in
    */
-  visualization_msgs::Marker createFingerMarker(const Eigen::Vector3d& center, const Eigen::Matrix3d& rot,
+  visualization_msgs::msg::Marker createFingerMarker(const Eigen::Vector3d& center, const Eigen::Matrix3d& rot,
     const Eigen::Vector3d& lwh, int id, const std::string& frame_id);
 
   /**
-   * \brief Convert a list of grasps to a ROS message that can be published to rviz.
-   * \param hands list of grasps
-   * \param start
+   * \brief Create the hand base marker.
+   * \param start starting point of the hand base
+   * \param end ending point of the hand base
+   * \param frame the orientation of the hand base
+   * \param length length of the hand base
+   * \param height height of the hand base
+   * \param id unique ID for the marker
    * \param frame_id the name of the frame that the grasp is in
    */
-  visualization_msgs::Marker createHandBaseMarker(const Eigen::Vector3d& start, const Eigen::Vector3d& end,
+  visualization_msgs::msg::Marker createHandBaseMarker(const Eigen::Vector3d& start, const Eigen::Vector3d& end,
     const Eigen::Matrix3d& frame, double length, double height, int id, const std::string& frame_id);
-
 
 private:
 
-  ros::Publisher rviz_pub_; ///< ROS publisher for grasps in rviz (visualization)
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr rviz_pub_; ///< ROS2 publisher for grasps in rviz
 
   double outer_diameter_;
   double hand_depth_;

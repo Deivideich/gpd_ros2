@@ -1,4 +1,4 @@
-#include <gpd_ros2/grasp_detection_server.h>
+#include "gpd_ros2_executables/grasp_detection_server.h"
 
 
 GraspDetectionServer::GraspDetectionServer(ros::NodeHandle& node)

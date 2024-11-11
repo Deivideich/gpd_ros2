@@ -29,50 +29,49 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #ifndef GRASP_DETECTION_SERVER_H_
 #define GRASP_DETECTION_SERVER_H_
 
-
-// ROS
-#include <eigen_conversions/eigen_msg.h>
+// ROS2
+#include <tf2_eigen/tf2_eigen.hpp>
 #include <pcl_conversions/pcl_conversions.h>
-#include <ros/ros.h>
-#include <visualization_msgs/Marker.h>
-#include <visualization_msgs/MarkerArray.h>
+#include <rclcpp/rclcpp.hpp>
+#include <visualization_msgs/msg/marker.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 // GPD
 #include <gpd/util/cloud.h>
-#include <gpd_ros2/CloudSamples.h>
 #include <gpd/grasp_detector.h>
+#include "gpd_ros2_msgs/msg/cloud_samples.hpp"
+// #include <gpd/grasp_detector.h>
 
 // this project (services)
-#include <gpd_ros2/detect_grasps.h>
+#include <gpd_ros2_msgs/srv/detect_grasps.hpp>
 
 // this project (messages)
-#include <gpd_ros2/GraspConfig.h>
-#include <gpd_ros2/GraspConfigList.h>
+#include <gpd_ros2_msgs/msg/grasp_config.hpp>
+#include <gpd_ros2_msgs/msg/grasp_config_list.hpp>
 
 // this project (headers)
-#include <gpd_ros2/grasp_messages.h>
-#include <gpd_ros2/grasp_plotter.h>
+#include "gpd_ros2_executables/grasp_messages.h"
+#include "gpd_ros2_executables/grasp_plotter.h"
 
 typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloudRGBA;
 typedef pcl::PointCloud<pcl::PointNormal> PointCloudPointNormal;
 
-class GraspDetectionServer
+class GraspDetectionServer : public rclcpp::Node
 {
 public:
 
   /**
    * \brief Constructor.
-   * \param node the ROS node
-  */
-  GraspDetectionServer(ros::NodeHandle& node);
+   * \param node the ROS2 node
+   */
+  GraspDetectionServer(const rclcpp::NodeOptions & options);
 
   /**
    * \brief Destructor.
-  */
+   */
   ~GraspDetectionServer()
   {
     delete cloud_camera_;
@@ -85,15 +84,15 @@ public:
    * \param req the service request
    * \param res the service response
    */
-  bool detectGrasps(gpd_ros2::detect_grasps::Request& req, gpd_ros2::detect_grasps::Response& res);
-
+  bool detectGrasps(const std::shared_ptr<gpd_ros2_msgs::srv::DetectGrasps::Request> req,
+                    std::shared_ptr<gpd_ros2_msgs::srv::DetectGrasps::Response> res);
 
 private:
 
-  ros::Publisher grasps_pub_; ///< ROS publisher for grasp list messages
-  ros::Publisher pc_pub_1_;
+  rclcpp::Publisher<gpd_ros2_msgs::msg::GraspConfigList>::SharedPtr grasps_pub_; ///< ROS2 publisher for grasp list messages
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pc_pub_1_; ///< ROS2 publisher for point cloud
 
-  std_msgs::Header cloud_camera_header_; ///< stores header of the point cloud
+  std_msgs::msg::Header cloud_camera_header_; ///< stores header of the point cloud
   std::string frame_; ///< point cloud frame
 
   gpd::GraspDetector* grasp_detector_; ///< used to run the grasp pose detection
